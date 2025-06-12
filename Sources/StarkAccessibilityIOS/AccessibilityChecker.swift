@@ -44,9 +44,10 @@ public class AccessibilityChecker {
             // Tell XCTest we'll handle the issue ourselves
             return true
         }
-        if !collectedScanResults.isEmpty {
-            self.reportService.send(results: collectedScanResults, scanName: scanName)
-            
+        
+        self.reportService.send(results: collectedScanResults, scanName: scanName)
+        
+        if !collectedScanResults.isEmpty {            
             if failTestOnAccessibilityIssues {
                 throw AccessibilityError.issuesFound(collectedScanResults)
             }

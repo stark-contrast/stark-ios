@@ -115,12 +115,7 @@ public class WebApiReportService: ReportService {
             request.setValue("Bearer \(starkProjectToken)", forHTTPHeaderField: "Authorization")
             request.setValue(LibraryVersion.userAgent, forHTTPHeaderField: "User-Agent")
             request.httpBody = jsonData
-            
-            // For debugging: print the request body that was sent
-            if let requestBody = request.httpBody, let requestString = String(data: requestBody, encoding: .utf8) {
-                print("Request body being sent: \(requestString)")
-            }
-            
+                        
             // Send the request
             let task = session.dataTask(with: request) { data, response, error in
                 if let error = error {
@@ -134,10 +129,6 @@ public class WebApiReportService: ReportService {
                         print("Successfully sent \(results.count) accessibility issues (Status code: \(statusCode))")
                     } else {
                         print("Failed to send accessibility report (Status code: \(statusCode))")
-                        
-                        if let responseData = data, let responseString = String(data: responseData, encoding: .utf8) {
-                            print("Response: \(responseString)")
-                        }
                     }
                 }
             }
