@@ -162,6 +162,7 @@ public class WebApiReportService: ReportService {
 
             // Bounded wait: if the network hangs we stop waiting and return rather than wedge the test.
             if semaphore.wait(timeout: .now() + requestTimeoutSeconds) == .timedOut {
+                task.cancel()
                 print("Timed out waiting for accessibility report to send")
             }
         } catch {

@@ -81,6 +81,9 @@ final class StubURLProtocol: URLProtocol {
 
     override func startLoading() {
         guard let responder = StubURLProtocol.responder else {
+            // Set the flag before notifying the client: URLSession can fire the task completion
+            // handler (unblocking WebApiReportService.send) the moment it receives this callback.
+            StubURLProtocol.didComplete = true
             client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
             return
         }
@@ -88,11 +91,12 @@ final class StubURLProtocol: URLProtocol {
             let (response, data) = try responder(request)
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: data)
+            StubURLProtocol.didComplete = true
             client?.urlProtocolDidFinishLoading(self)
         } catch {
+            StubURLProtocol.didComplete = true
             client?.urlProtocol(self, didFailWithError: error)
         }
-        StubURLProtocol.didComplete = true
     }
 
     override func stopLoading() {}
