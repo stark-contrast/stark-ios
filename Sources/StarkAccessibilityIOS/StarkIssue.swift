@@ -14,7 +14,10 @@ public struct StarkIssue: Encodable, Sendable {
     public let auditType: String
     public let elementIdentifier: String?
     public let elementLabel: String?
-    
+
+    /// Stable identity hash for this issue, used by the backend to dedupe/track it across runs.
+    public let fingerprint: String
+
     /// Creates a new StarkIssue from an XCUIAccessibilityAuditIssue
     /// - Parameter issue: The XCUIAccessibilityAuditIssue to convert
     @MainActor
@@ -22,7 +25,7 @@ public struct StarkIssue: Encodable, Sendable {
         self.compactDescription = issue.compactDescription
         self.detailedDescription = issue.detailedDescription
         self.auditType = StarkIssue.getAuditTypeString(issue.auditType)
-        
+
         // Capture these values in the main actor context
         if let element = issue.element {
             self.elementDescription = element.description
@@ -33,6 +36,12 @@ public struct StarkIssue: Encodable, Sendable {
             self.elementIdentifier = nil
             self.elementLabel = nil
         }
+
+        self.fingerprint = generateDefaultFingerprint(
+            auditType: self.auditType,
+            elementIdentifier: self.elementIdentifier,
+            elementLabel: self.elementLabel,
+            compactDescription: self.compactDescription)
     }
         
     public static func getAuditTypeString(_ auditType: XCUIAccessibilityAuditType) -> String {
